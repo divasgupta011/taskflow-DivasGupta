@@ -3,6 +3,7 @@ package app
 import (
 	"database/sql"
 	"net/http"
+	"taskflow/internal/auth"
 	"taskflow/internal/config"
 	"taskflow/internal/db"
 
@@ -10,9 +11,10 @@ import (
 )
 
 type App struct {
-	router *chi.Mux
-	cfg    *config.Config
-	db     *sql.DB
+	router      *chi.Mux
+	cfg         *config.Config
+	db          *sql.DB
+	authHandler *auth.Handler
 }
 
 func New() *App {
@@ -20,15 +22,22 @@ func New() *App {
 
 	cfg := config.Load()
 
+	db.RunMigrations(cfg.DBUrl())
+
 	database, err := db.New(cfg)
 	if err != nil {
 		panic(err)
 	}
 
+	authRepo := auth.NewRepository(database)
+	authService := auth.NewService(authRepo, cfg.JWTSecret)
+	authHandler := auth.NewHandler(authService)
+
 	app := &App{
-		router: r,
-		cfg:    cfg,
-		db:     database,
+		router:      r,
+		cfg:         cfg,
+		db:          database,
+		authHandler: authHandler,
 	}
 
 	app.routes()

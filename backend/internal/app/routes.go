@@ -9,4 +9,8 @@ func (a *App) routes() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
+
+	a.router.Post("/auth/register", a.authHandler.Register)
+	a.router.Post("/auth/login", a.authHandler.Login)
+
 }
