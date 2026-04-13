@@ -38,6 +38,7 @@ The application follows a layered architecture:
 git clone https://github.com/divasgupta011/taskflow-DivasGupta.git
 cd taskflow-DivasGupta
 cp .env.example .env
+(On Windows, use `copy` instead)
 docker compose up --build
 ```
 
