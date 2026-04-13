@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+	"taskflow/internal/pkg/response"
 )
 
 type contextKey string
@@ -16,13 +17,15 @@ func AuthMiddleware(secret string) func(http.Handler) http.Handler {
 
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				// http.Error(w, "unauthorized", http.StatusUnauthorized)
+				response.Error(w, http.StatusUnauthorized, "unauthorized")
 				return
 			}
 
 			parts := strings.Split(authHeader, " ")
 			if len(parts) != 2 || parts[0] != "Bearer" {
-				http.Error(w, "invalid auth header", http.StatusUnauthorized)
+				// http.Error(w, "invalid auth header", http.StatusUnauthorized)
+				response.Error(w, http.StatusUnauthorized, "invalid auth header")
 				return
 			}
 
@@ -30,7 +33,8 @@ func AuthMiddleware(secret string) func(http.Handler) http.Handler {
 
 			userID, err := ParseJWT(tokenStr, secret)
 			if err != nil {
-				http.Error(w, "invalid token", http.StatusUnauthorized)
+				// http.Error(w, "invalid token", http.StatusUnauthorized)
+				response.Error(w, http.StatusUnauthorized, "invalid token")
 				return
 			}
 
